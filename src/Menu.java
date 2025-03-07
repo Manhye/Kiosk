@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Menu {
-    List<MenuItem> menuItems = new ArrayList<MenuItem>();
+    List<MenuItem> menuItems = new ArrayList<>();
     private final List<String> categories = new ArrayList<>();
 
 
@@ -37,9 +37,9 @@ public class Menu {
         String cat = categories.get(inp);
         System.out.println("[ " + cat.toUpperCase() + " ]");
         int index = 1;
-        for(int i = 0; i < menuItems.size(); i++){
-            if(menuItems.get(i).getCategory().equals(cat)){
-                System.out.println(index + ". " + menuItems.get(i).getName()+"(₩ "+menuItems.get(i).getPrice()+"): "+menuItems.get(i).getDescription());
+        for (MenuItem menuItem : menuItems) {
+            if (menuItem.getCategory().equals(cat)) {
+                System.out.println(index + ". " + menuItem.getName() + "(₩ " + menuItem.getPrice() + "): " + menuItem.getDescription());
                 index++;
             }
         }
@@ -48,9 +48,9 @@ public class Menu {
 
     public void selected(int inp, int inp2){
         List<MenuItem> temp = new ArrayList<>();
-        for(int i = 0; i < menuItems.size(); i++){
-            if(menuItems.get(i).getCategory().equals(categories.get(inp))){
-                temp.add(menuItems.get(i));
+        for (MenuItem menuItem : menuItems) {
+            if (menuItem.getCategory().equals(categories.get(inp))) {
+                temp.add(menuItem);
             }
         }
         System.out.println("Selected Menu: "+temp.get(inp2).getName()+"(₩ "+temp.get(inp2).getPrice()+"): "+temp.get(inp2).getDescription());
