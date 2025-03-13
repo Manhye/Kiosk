@@ -1,16 +1,17 @@
 package Front;
 
 import Back.Cart;
-import Back.Menu;
+import Back.MenuItems;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import Back.Server;
 
 public class ItemListScreen extends JPanel {
     private DefaultListModel<List<String>> itemListModel;
@@ -18,83 +19,63 @@ public class ItemListScreen extends JPanel {
     private JPanel cartPanel;
     private JLabel totalPriceLabel;
     private Cart cart;
+    private CardLayout cardLayout;
+    private JPanel panelContainer;
+
 
     public ItemListScreen(CardLayout cardLayout, JPanel panelContainer) {
+        this.cardLayout = cardLayout;
+        this.panelContainer = panelContainer;
+
         setLayout(new BorderLayout());
         cart = new Cart();
 
+        // Initialize the components
+        initializeTopBar(cardLayout, panelContainer);
+        initializeItemList();
+        initializeCartPanel();
+        initializeCartStatus();
+    }
 
-        //Top  Bar
+    private void initializeTopBar(CardLayout cardLayout, JPanel panelContainer) {
         JPanel topBar = new JPanel();
         topBar.setLayout(new BorderLayout());
+        topBar.setBackground(new Color(204, 153, 255));
+        topBar.setPreferredSize(new Dimension(0, 50));
 
         JLabel label = new JLabel("Food Fighter", SwingConstants.CENTER);
         label.setFont(new Font("Arial", Font.BOLD, 30));
         topBar.add(label, BorderLayout.CENTER);
-        topBar.setBackground(new Color(204, 153, 255));
-        topBar.setPreferredSize(new Dimension(0, 50));
 
-
-
-        //Back Button
-        JButton backButton = new JButton("BACK");
-        backButton.setFont(new Font("Arial", Font.BOLD, 15));
-        backButton.setBackground(new Color(204, 153, 255));
-        backButton.setForeground(Color.BLACK);
-        backButton.setPreferredSize(new Dimension(100,40));
-
-        backButton.addActionListener(e->{
-            cardLayout.previous(panelContainer);
-        });
-
-        JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,0,0));
+        JButton backButton = createBackButton(cardLayout, panelContainer);
+        JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         backButtonPanel.setOpaque(false);
         backButtonPanel.add(backButton);
 
         topBar.add(backButton, BorderLayout.EAST);
         add(topBar, BorderLayout.NORTH);
+    }
 
+    private JButton createBackButton(CardLayout cardLayout, JPanel panelContainer) {
+        JButton backButton = new JButton("BACK");
+        backButton.setFont(new Font("Arial", Font.BOLD, 15));
+        backButton.setBackground(new Color(204, 153, 255));
+        backButton.setForeground(Color.BLACK);
+        backButton.setPreferredSize(new Dimension(100, 40));
 
+        backButton.addActionListener(e -> cardLayout.previous(panelContainer));
+        return backButton;
+    }
+
+    private void initializeItemList() {
         itemListModel = new DefaultListModel<>();
         itemList = new JList<>(itemListModel);
         itemList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         itemList.setCellRenderer(new ItemRenderer());
 
-
-
         JScrollPane scrollPane = new JScrollPane(itemList);
         add(scrollPane, BorderLayout.CENTER);
 
-
-        //Cart Status
-        JPanel statusPanel = new JPanel();
-        statusPanel.setLayout(new BorderLayout());
-        statusPanel.setPreferredSize(new Dimension(0, 160));
-        add(statusPanel, BorderLayout.SOUTH);
-
-
-        cartPanel = new JPanel();
-        cartPanel.setLayout(new BoxLayout(cartPanel, BoxLayout.Y_AXIS));
-        JScrollPane cartScrollPane = new JScrollPane(cartPanel);
-        cartScrollPane.setPreferredSize(new Dimension(0, 120));
-        statusPanel.add(cartScrollPane, BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        totalPriceLabel = new JLabel("Total Price: 0₩", SwingConstants.RIGHT);
-        totalPriceLabel.setFont(new Font("Arial", Font.BOLD, 16));
-
-        JButton checkoutButton = new JButton("Pay");
-        checkoutButton.setFont(new Font("Arial", Font.BOLD, 16));
-        checkoutButton.setBackground(new Color(0, 150, 0));
-        checkoutButton.setForeground(Color.WHITE);
-        checkoutButton.setPreferredSize(new Dimension(120, 40));
-
-        bottomPanel.add(totalPriceLabel, BorderLayout.WEST);
-        bottomPanel.add(checkoutButton, BorderLayout.EAST);
-        statusPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-
-        // Double Click -> Add to cart
         itemList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -109,8 +90,40 @@ public class ItemListScreen extends JPanel {
                 }
             }
         });
+    }
 
-        //payment button
+    private void initializeCartPanel() {
+        cartPanel = new JPanel();
+        cartPanel.setLayout(new BoxLayout(cartPanel, BoxLayout.Y_AXIS));
+        JScrollPane cartScrollPane = new JScrollPane(cartPanel);
+        cartScrollPane.setPreferredSize(new Dimension(0, 120));
+    }
+
+    private void initializeCartStatus() {
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new BorderLayout());
+        statusPanel.setPreferredSize(new Dimension(0, 160));
+        add(statusPanel, BorderLayout.SOUTH);
+
+        statusPanel.add(cartPanel, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        totalPriceLabel = new JLabel("Total Price: 0₩", SwingConstants.RIGHT);
+        totalPriceLabel.setFont(new Font("Arial", Font.BOLD, 16));
+
+        JButton checkoutButton = createCheckoutButton();
+        bottomPanel.add(totalPriceLabel, BorderLayout.WEST);
+        bottomPanel.add(checkoutButton, BorderLayout.EAST);
+        statusPanel.add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    private JButton createCheckoutButton() {
+        JButton checkoutButton = new JButton("Pay");
+        checkoutButton.setFont(new Font("Arial", Font.BOLD, 16));
+        checkoutButton.setBackground(new Color(0, 150, 0));
+        checkoutButton.setForeground(Color.WHITE);
+        checkoutButton.setPreferredSize(new Dimension(120, 40));
+
         checkoutButton.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(
                     null,
@@ -123,92 +136,96 @@ public class ItemListScreen extends JPanel {
                 JOptionPane.showMessageDialog(null, "Payment completed!");
                 cart.clear();
                 updateCart();
+
+                cardLayout.show(panelContainer, "RestaurantScreen");
+
             } else {
                 JOptionPane.showMessageDialog(null, "Payment cancelled!");
             }
         });
 
+        return checkoutButton;
     }
 
     private void updateCart() {
         cartPanel.removeAll();
-        cartPanel.setLayout(new GridLayout(0,1,5,5));
+        cartPanel.setLayout(new GridLayout(0, 1, 5, 5));
 
         for (Map.Entry<String, Integer> entry : cart.getCartItems().entrySet()) {
             String itemName = entry.getKey();
             int quantity = entry.getValue();
             int price = cart.getItemPrice(itemName);
 
-            JPanel itemRow = new JPanel(new BorderLayout());
-            itemRow.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-
-            JLabel itemLabel = new JLabel(itemName + " (" + price + "₩)" +" X"+quantity );
-
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-            JButton plusButton = new JButton("+");
-            JButton minusButton = new JButton("-");
-            JButton deleteButton = new JButton("X");
-
-            Dimension buttonSize = new Dimension(50, 30);
-            plusButton.setPreferredSize(buttonSize);
-            minusButton.setPreferredSize(buttonSize);
-            deleteButton.setPreferredSize(buttonSize);
-
-            plusButton.setHorizontalAlignment(SwingConstants.CENTER);
-            minusButton.setHorizontalAlignment(SwingConstants.CENTER);
-            deleteButton.setHorizontalAlignment(SwingConstants.CENTER);
-
-            buttonPanel.add(plusButton);
-            buttonPanel.add(minusButton);
-            buttonPanel.add(deleteButton);
-
-            plusButton.addActionListener(e -> {
-                cart.addItem(itemName, price);
-                updateCart();
-            });
-
-            minusButton.addActionListener(e -> {
-                cart.removeItem(itemName);
-                updateCart();
-            });
-
-            deleteButton.addActionListener(e -> {
-                cart.deleteItem(itemName);
-                updateCart();
-            });
-
-            itemRow.add(itemLabel, BorderLayout.WEST);
-            itemRow.add(buttonPanel, BorderLayout.EAST);
-
+            JPanel itemRow = createItemRow(itemName, price, quantity);
             cartPanel.add(itemRow);
         }
 
         totalPriceLabel.setText("Total Price: " + cart.getTotalPrice() + "₩");
 
-
         cartPanel.revalidate();
         cartPanel.repaint();
     }
 
+    private JPanel createItemRow(String itemName, int price, int quantity) {
+        JPanel itemRow = new JPanel(new BorderLayout());
+        itemRow.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
+        JLabel itemLabel = new JLabel(itemName + " (" + price + "₩)" + " X" + quantity);
+        itemRow.add(itemLabel, BorderLayout.WEST);
 
+        JPanel buttonPanel = createItemButtons(itemName, price);
+        itemRow.add(buttonPanel, BorderLayout.EAST);
 
-
-    //add items on itemListModel
-    public void setRestaurantInfo(String restaurantName) {
-        itemListModel.clear();
-        //check log
-        System.out.println("Selected Restaurant: " + restaurantName);
-        HashMap<String, List<List<String>>> items = Menu.getItemsForRestaurant(restaurantName);
-        List<List<String>> menuItems=items.get(restaurantName);
-        for (List<String> item : menuItems) {
-            itemListModel.addElement(item);
-        }
-
+        return itemRow;
     }
 
-    //Cart Interface
+    private JPanel createItemButtons(String itemName, int price) {
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+
+        JButton plusButton = createButton("+", e -> {
+            cart.addItem(itemName, price);
+            updateCart();
+        });
+        JButton minusButton = createButton("-", e -> {
+            cart.removeItem(itemName);
+            updateCart();
+        });
+        JButton deleteButton = createButton("X", e -> {
+            cart.deleteItem(itemName);
+            updateCart();
+        });
+
+        buttonPanel.add(plusButton);
+        buttonPanel.add(minusButton);
+        buttonPanel.add(deleteButton);
+
+        return buttonPanel;
+    }
+
+    private JButton createButton(String text, java.awt.event.ActionListener actionListener) {
+        JButton button = new JButton(text);
+        button.setPreferredSize(new Dimension(50, 30));
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.addActionListener(actionListener);
+        return button;
+    }
+
+    // add items to itemListModel
+    public void setRestaurantInfo(String restaurantName) throws IOException {
+        itemListModel.clear();
+        System.out.println("Selected Restaurant: " + restaurantName);
+
+        List<MenuItems> menuItems = Server.getItemsForRestaurant(restaurantName);
+        for (MenuItems item : menuItems) {
+            List<String> menus = new ArrayList<>();
+            menus.add(item.getName());
+            menus.add(Integer.toString(item.getPrice()));
+            menus.add(item.getDescription());
+            itemListModel.addElement(menus);
+        }
+    }
+
+    // Cart Interface
     private static class ItemRenderer extends JPanel implements ListCellRenderer<List<String>> {
         private JLabel nameLabel, priceLabel;
         private JTextArea descTextArea;
@@ -231,7 +248,6 @@ public class ItemListScreen extends JPanel {
             descTextArea.setEditable(false);
             descTextArea.setBackground(Color.WHITE);
 
-
             JPanel textPanel = new JPanel(new GridLayout(3, 1));
             textPanel.add(nameLabel);
             textPanel.add(priceLabel);
@@ -239,7 +255,6 @@ public class ItemListScreen extends JPanel {
 
             add(textPanel, BorderLayout.CENTER);
             setBackground(Color.WHITE);
-
         }
 
         @Override
@@ -258,7 +273,4 @@ public class ItemListScreen extends JPanel {
             return this;
         }
     }
-
-
-
 }

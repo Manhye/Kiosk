@@ -20,8 +20,7 @@ public class GUI {
         panelContainer.add(new StartScreen(cardLayout, panelContainer), "StartScreen");
         panelContainer.add(new RestaurantScreen(cardLayout, panelContainer).getRestaurantScreen(), "RestaurantScreen");
         panelContainer.add(new ItemListScreen(cardLayout, panelContainer), "ItemListScreen");
-        //panelContainer.add(new PaymentScreen(cardLayout, panelContainer), "PaymentScreen");
-        panelContainer.add(new AdminScreen(cardLayout, panelContainer), "AdminScreen");
+        panelContainer.add(new AdminScreen(cardLayout, panelContainer).getAdminScreen(), "AdminScreen");
 
         frame.add(panelContainer);
         frame.setVisible(true);
