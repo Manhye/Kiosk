@@ -40,20 +40,20 @@
 3. Access the admin page with a password to manage the menu.
 
 ## How it looks like?
-![img.png](assets/image/startScreen.png)
+![img.png](src/assets/image/startScreen.png)
 - This is the start screen.
 - You can start the application just by clicking anywhere.
   <br>
   <br>
   <br>
 
-![img_1.png](assets/image/restaurantScreen.png)
+![img_1.png](src/assets/image/restaurantScreen.png)
 - This is the restaurant screen.
 - You can check out four restaurants.
 - If you click the icon of the restaurant, you can check out the menus of each restaurant.
 - In the top-right corner, you can find ADMIN button. If you click the button and type the ADMIN password("0000"), you can access on ADMIN page.
   <br><br><br>
-![img.png](assets/itemListScreen/img.png)
+![img.png](src/assets/itemListScreen/img.png)
 - This is the item list screen.
 - You can check out foods list on the restaurant.
 - If you double click the menu, the menu is added on the cart below.
@@ -62,24 +62,24 @@
 - `X`: Delete the menu from the cart.
 - `Pay`: You can proceed on payment.
 <br><br><br>
-![img_1.png](assets/discountCombobox/img_1.png)
+![img_1.png](src/assets/discountCombobox/img_1.png)
 - If you click the `Pay` button, you can choose your discount option.
   <br><br><br>
-![img.png](assets/paymentProceed/img.png)
+![img.png](src/assets/paymentProceed/img.png)
 - If you choose the discount option, you can get the payment check box and finally decide whether you will pay or not.
   <br><br><br>
-![img.png](assets/adminPW/img.png)
+![img.png](src/assets/adminPW/img.png)
 - This box appears when you click the ADMIN button on the restaurant screen.
 - You may type the password("0000") to access on ADMIN screen.
   <br><br><br>
-![img.png](assets/adminScreen/img.png)
+![img.png](src/assets/adminScreen/img.png)
 - When you type the correct password, ADMIN screen comes out.
 - You can add or delete menu on this page.
   <br><br><br>
-![img.png](assets/addMenu/img.png)
+![img.png](src/assets/addMenu/img.png)
 - If you fill the dialogs and click the `OK` button, the menu will be added on the decided Restaurant of the combo box.
   <br><br><br>
-![img.png](assets/deleteMenu/img.png)
+![img.png](src/assets/deleteMenu/img.png)
 - If you type the exact name of the menu of the restaurant, you can delete the menu.
 - If you type the name which is not on the menu, you can get the message that item does not exist.
 
