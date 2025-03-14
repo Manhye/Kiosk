@@ -1,6 +1,7 @@
 package Front;
 
 import Back.Cart;
+import Back.Discount;
 import Back.MenuItems;
 
 import javax.swing.*;
@@ -119,28 +120,48 @@ public class ItemListScreen extends JPanel {
 
     private JButton createCheckoutButton() {
         JButton checkoutButton = new JButton("Pay");
+
         checkoutButton.setFont(new Font("Arial", Font.BOLD, 16));
         checkoutButton.setBackground(new Color(0, 150, 0));
         checkoutButton.setForeground(Color.WHITE);
         checkoutButton.setPreferredSize(new Dimension(120, 40));
 
         checkoutButton.addActionListener(e -> {
+            JComboBox<Discount> discountComboBox = new JComboBox<>(Discount.values());
+            int totalPrice = cart.getTotalPrice();
+            Discount discount = (Discount) discountComboBox.getSelectedItem();
+
+            double discountRate = discount.getRate();
+            double finalPrice = totalPrice*(1-discountRate);
+
+
             int result = JOptionPane.showConfirmDialog(
                     null,
-                    "Are you sure you want to pay?",
-                    "Payment Check",
-                    JOptionPane.YES_NO_OPTION
+                    discountComboBox,
+                    "Select Discount Type",
+                    JOptionPane.OK_CANCEL_OPTION
             );
 
-            if (result == JOptionPane.YES_OPTION) {
-                JOptionPane.showMessageDialog(null, "Payment completed!");
-                cart.clear();
-                updateCart();
+            if (result == JOptionPane.OK_OPTION) {
+                int paymentCheck = JOptionPane.showConfirmDialog(
+                        null,
+                        "Discount: " + (discountRate * 100) + "%\n" +
+                                "Original Price: " + totalPrice + "￦\n" +
+                                "Final Price: " + finalPrice + "￦\n\n" +
+                                "Do you want to proceed with the payment?",
+                        "Payment Check",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (paymentCheck == JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(null, "Payment completed!");
+                    cart.clear();
+                    updateCart();
+                    cardLayout.show(panelContainer, "RestaurantScreen");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Payment cancelled!");
+                }
 
-                cardLayout.show(panelContainer, "RestaurantScreen");
 
-            } else {
-                JOptionPane.showMessageDialog(null, "Payment cancelled!");
             }
         });
 
